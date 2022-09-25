@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="w-[30rem] mx-auto">
+      <input class="result-input w-full" type="text" readonly placeholder="0" />
+
+      <div class="grid grid-cols-3 mt-3 gap-1">
+        <button class="button num-button">1</button>
+        <button class="num-button">2</button>
+        <button class="num-button">3</button>
+        <button class="num-button">4</button>
+        <button class="num-button">5</button>
+        <button class="num-button">6</button>
+        <button class="num-button">7</button>
+        <button class="num-button">8</button>
+        <button class="num-button">9</button>
+        <button class="num-button">0</button>
+        <button class="num-button">.</button>
+      </div>
+
+      <div class="grid grid-cols-2 mt-3 gap-1">
+        <button class="operator-button">+</button>
+        <button class="operator-button">-</button>
+        <button class="operator-button">*</button>
+        <button class="operator-button">/</button>
+      </div>
+
+      <div class="grid grid-cols-2 mt-3 gap-1">
+        <button class="equal-button">=</button>
+        <button class="reset-button">C</button>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const input = document.querySelector(".result-input");
+    const numButtons = document.querySelectorAll(".num-button");
+    const operatorButtons = document.querySelectorAll(".operator-button");
+    const equalButton = document.querySelector(".equal-button");
+    const resetButton = document.querySelector(".reset-button");
+
+    const state = {
+      input: [],
+    };
+
+    const OPERATOR = "operator";
+    const NUM = "num";
+
+    const updateInput = (value) => {
+      input.value = value;
+    };
+    const getInputString = () => {
+      return state.input.map((action) => action.value).join(" ");
+    };
+    const calculate = () => {
+      return eval(getInputString());
+    };
+    const handleNum = (action) => {
+      const lastInput = state.input.at(-1);
+      if (!lastInput || lastInput.type === OPERATOR) {
+        state.input.push(action);
+      } else {
+        lastInput.value = lastInput.value === "0" ? action.value : `${lastInput.value}${action.value}`;
+      }
+    };
+    const handleOperator = (action) => {
+      const lastInput = state.input.at(-1);
+      if (!lastInput || lastInput.type !== OPERATOR) {
+        state.input.push(action);
+      } else {
+        lastInput.value = action.value;
+      }
+    };
+    const handleClick = (action) => {
+      const map = {
+        [OPERATOR]: handleOperator,
+        [NUM]: handleNum,
+      };
+      const handler = map[action.type];
+      handler && handler(action);
+      updateInput(getInputString());
+    };
+
+    numButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const buttonValue = button.textContent;
+        handleClick({ type: NUM, value: buttonValue });
+      });
+    });
+
+    operatorButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const buttonValue = button.textContent;
+        handleClick({ type: OPERATOR, value: buttonValue });
+      });
+    });
+
+    equalButton.addEventListener("click", () => {
+      const result = calculate();
+      updateInput(result);
+      state.input = [{ type: NUM, value: result }];
+    });
+
+    resetButton.addEventListener("click", () => {
+      updateInput("");
+      state.input = [];
+    });
+  </script>
+</html>
