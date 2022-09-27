@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Form Validation</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      form {
+        width: 300px;
+        margin: 0 auto;
+        border: 1px solid gray;
+        border-radius: 3px;
+        padding: 20px;
+      }
+
+      label {
+        display: block;
+      }
+
+      label + label {
+        margin-top: 10px;
+      }
+
+      label .field-title {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      label .error {
+        display: block;
+        color: darkred;
+        margin-top: 3px;
+        font-size: 0.8rem;
+      }
+
+      input,
+      select {
+        min-height: 30px;
+        width: 100%;
+        border: 1px solid gray;
+        border-radius: 2px;
+      }
+
+      button {
+        display: block;
+        margin: 15px auto 0;
+        min-width: 100px;
+        min-height: 40px;
+        cursor: pointer;
+      }
+
+      :is(input, select):invalid {
+        border-color: darkred;
+      }
+
+      :is(input, select):valid {
+        border-color: darkgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <label>
+        <span class="field-title">Name:</span>
+        <input type="text" name="name" required minlength="3" />
+      </label>
+
+      <label>
+        <span class="field-title">Email:</span>
+        <input type="text" name="email" required minlength="3" />
+      </label>
+
+      <label>
+        <span class="field-title">Age:</span>
+        <select name="age" required>
+          <option value="">18</option>
+          <option value="">19</option>
+          <option value="">20</option>
+          <option value="">21</option>
+          <option value="">22</option>
+          <option value="">23</option>
+          <option value="">24</option>
+          <option value="">25</option>
+          <option value="">26</option>
+          <option value="">27</option>
+          <option value="">28</option>
+          <option value="">29</option>
+          <option value="">30</option>
+          <option value="">31</option>
+          <option value="">32</option>
+          <option value="">33</option>
+          <option value="">34</option>
+          <option value="">35</option>
+          <option value="">36</option>
+          <option value="">37</option>
+          <option value="">38</option>
+          <option value="">39</option>
+          <option value="">40</option>
+          <option value="">41</option>
+          <option value="">42</option>
+          <option value="">43</option>
+          <option value="">44</option>
+          <option value="">45</option>
+          <option value="">46</option>
+          <option value="">47</option>
+          <option value="">48</option>
+          <option value="">49</option>
+          <option value="">50</option>
+        </select>
+      </label>
+
+      <label>
+        <span class="field-title">Phone:</span>
+        <input type="tel" name="phone" required pattern="\+37525\d{7}" />
+      </label>
+
+      <label>
+        <span class="field-title">Color:</span>
+        <input type="color" name="color" />
+      </label>
+
+      <label>
+        <span class="field-title">Experience:</span>
+        <input type="range" name="experience" min="1" max="12" />
+      </label>
+
+      <label>
+        <span class="field-title">Password:</span>
+        <input type="password" name="password" required />
+      </label>
+
+      <label>
+        <span class="field-title">Confirm Password:</span>
+        <input type="password" name="confirm-password" required />
+      </label>
+
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+
+  <script>
+    const form = document.querySelector("form");
+    const submitButton = form.querySelector("button[type=submit]");
+    form.noValidate = true;
+
+    const createError = (message) => {
+      const node = document.createElement("span");
+      node.textContent = message;
+      node.classList.add("error");
+      node.dataset.error = "";
+      return node;
+    };
+    const showError = (node, message) => {
+      const errorNode = node.parentElement.querySelector("[data-error]");
+      if (errorNode) {
+        errorNode.textContent = message;
+        return;
+      }
+
+      const error = createError(message);
+      node.parentElement.appendChild(error);
+    };
+    const hideError = (node) => {
+      const errorNode = node.parentElement.querySelector("[data-error]");
+      if (!errorNode) return;
+      node.parentElement.removeChild(errorNode);
+    };
+    const clearFormErrorMessage = () => {
+      submitButton.setCustomValidity("");
+    };
+    const updateFormValidationMessage = (form) => {
+      if (form.checkValidity()) return;
+
+      submitButton.setCustomValidity("Please, check data you entered.");
+      submitButton.reportValidity();
+    };
+    const updateValidation = (field) => {
+      if (!field.checkValidity()) {
+        showError(field, field.validationMessage);
+      } else {
+        hideError(field);
+      }
+    };
+    const updateConfirmPasswordValidation = () => {
+      const password = fields.find((field) => field.name === "password");
+      const confirmPassword = fields.find((field) => field.name === "confirm-password");
+
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.setCustomValidity("Passwords don't match.");
+      } else {
+        confirmPassword.setCustomValidity("");
+        confirmPassword.validity.customError = false;
+      }
+
+      updateValidation(confirmPassword);
+    };
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      updateFormValidationMessage(form);
+
+      if (form.checkValidity()) {
+        fields.forEach((field) => {
+          hideError(field);
+        });
+        form.reset();
+      }
+    });
+
+    const fields = Array.from(form.elements);
+    const customValidator = {
+      password: [updateConfirmPasswordValidation],
+      "confirm-password": [updateConfirmPasswordValidation, true],
+    };
+    fields.forEach((field) => {
+      if (!field.name) return;
+      field.addEventListener("change", () => {
+        clearFormErrorMessage();
+        const [validate, disableDefault] = customValidator[field.name] || [];
+
+        validate && validate();
+        !disableDefault && updateValidation(field);
+      });
+    });
+  </script>
+</html>
