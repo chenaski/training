@@ -1,97 +1,282 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Flip Counter</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .counter {
-            display: flex;
-            box-shadow: inset 0 3px 0 0 black, 0 -3px 0 0 black;
-        }
-
-        .counter-num {
-            width: 100px;
-            height: 160px;
-            border: 3px solid black;
-            font-size: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: monospace;
-            font-weight: 700;
-            background: lightgoldenrodyellow;
-            transform-origin: top;
-        }
-
-        .counter-num.animate {
-            animation: flip 0.5s 1 linear;
-        }
-
-        .counter-num + .counter-num {
-            margin-left: 10px;
-        }
-
-        @keyframes flip {
-            100% {
-                transform: rotateX(-360deg);
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="counter">
-    <div class="counter-num">0</div>
-    <div class="counter-num">0</div>
-</div>
-
-<script>
-  const leftCounter = document.querySelector(".counter-num:first-child");
-  const rightCounter = document.querySelector(".counter-num:last-child");
-
-  const ANIMATION_CLASS = "animate";
-  const MAX = 3;
-
-  const removeAnimationClass = (e) => {
-    e.target.classList.remove(ANIMATION_CLASS);
-  }
-  leftCounter.addEventListener("animationend", removeAnimationClass);
-  rightCounter.addEventListener("animationend", removeAnimationClass);
-
-  const animate = (node) => {
-    node.classList.add(ANIMATION_CLASS);
-  }
-  const incrementCounter = (node, onUpdate) => {
-    const current = parseInt(node.textContent) || 0;
-    const next = (current + 1) % MAX;
-    setTimeout(() => node.textContent = next, 50);
-    animate(node);
-    onUpdate && onUpdate(next);
-  }
-
-  setInterval(() => {
-    incrementCounter(rightCounter, ((value) => {
-      if (value === 0) {
-        incrementCounter(leftCounter);
+      :root {
+        --animation-speed: 1s;
+        --perspective: 3000px;
       }
-    }))
-  }, 2000);
-</script>
-</body>
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .counter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        position: relative;
+        width: 240px;
+        height: 300px;
+      }
+
+      .container + .container {
+        margin-left: 50px;
+      }
+
+      .layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 200px;
+        font-family: monospace;
+        perspective: var(--perspective);
+      }
+
+      .top,
+      .bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 50%;
+        overflow: hidden;
+      }
+
+      .top {
+        top: 0;
+        transform-origin: 50% 100%;
+      }
+
+      .bottom {
+        bottom: 0;
+        transform-origin: 50% 0;
+      }
+
+      .top span,
+      .bottom span {
+        position: absolute;
+        height: 200%;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #333;
+        color: #ccc;
+        border-radius: 6px;
+      }
+
+      .top span {
+        top: 0;
+      }
+
+      .bottom span {
+        bottom: 0;
+      }
+
+      @keyframes top {
+        100% {
+          transform: rotateX(-90deg);
+        }
+      }
+
+      @keyframes bottom {
+        0% {
+          transform: rotateX(90deg);
+        }
+        100% {
+          transform: rotateX(0);
+        }
+      }
+
+      .animate-top .top {
+        animation: top var(--animation-speed) linear both;
+      }
+
+      .animate-bottom .bottom {
+        animation: bottom var(--animation-speed) linear both;
+      }
+
+      .controls {
+        margin-top: 40px;
+      }
+
+      .controls > * + * {
+        border-top: 1px solid lightgray;
+      }
+
+      label {
+        display: block;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 16px;
+        text-align: center;
+      }
+
+      label span {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      label input {
+        width: 400px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="counter">
+      <div class="container container-1">
+        <div class="layer layer-1" style="z-index: 2">
+          <div class="top">
+            <span>0</span>
+          </div>
+          <div class="bottom">
+            <span>0</span>
+          </div>
+        </div>
+        <div class="layer layer-2" style="z-index: 1">
+          <div class="top">
+            <span>1</span>
+          </div>
+          <div class="bottom">
+            <span>1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container container-2">
+        <div class="layer layer-1" style="z-index: 2">
+          <div class="top">
+            <span>0</span>
+          </div>
+          <div class="bottom">
+            <span>0</span>
+          </div>
+        </div>
+        <div class="layer layer-2" style="z-index: 1">
+          <div class="top">
+            <span>1</span>
+          </div>
+          <div class="bottom">
+            <span>1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label>
+        <span>Animation Speed:</span>
+        <input class="animation-speed-input" type="range" min="0.2" max="3" step="0.1" value="1" />
+        <span class="animation-speed-value">1s</span>
+      </label>
+
+      <label>
+        <span>Perspective:</span>
+        <input class="perspective-input" type="range" min="500" max="5000" step="100" value="3000" />
+        <span class="perspective-value">3000px</span>
+      </label>
+    </div>
+
+    <script>
+      const container1 = document.querySelector(".container-1");
+      const container2 = document.querySelector(".container-2");
+
+      const setupInput = (name, units) => {
+        const animationSpeedInput = document.querySelector(`.${name}-input`);
+        const animationSpeedValue = document.querySelector(`.${name}-value`);
+
+        animationSpeedInput.addEventListener("change", (e) => {
+          const root = document.documentElement;
+          const value = e.target.value;
+          const formattedValue = `${value}${units}`;
+          animationSpeedValue.textContent = formattedValue;
+          root.style.setProperty(`--${name}`, formattedValue);
+        });
+      };
+
+      setupInput("animation-speed", "s");
+      setupInput("perspective", "px");
+
+      const TOP_ANIMATION_NAME = "top";
+      const TOP_ANIMATION_CLASS = "animate-top";
+      const BOTTOM_ANIMATION_NAME = "bottom";
+      const BOTTOM_ANIMATION_CLASS = "animate-bottom";
+
+      function startAnimation(container, { max, once, onUpdate } = { max: 10, once: false }) {
+        const layer1 = container.querySelector(".layer-1");
+        const layer2 = container.querySelector(".layer-2");
+
+        let [topLayer, bottomLayer] = layer1.style.zIndex === "2" ? [layer1, layer2] : [layer2, layer1];
+
+        topLayer.classList.add(TOP_ANIMATION_CLASS);
+
+        const onTopAnimationEnd = () => {
+          bottomLayer.classList.add(BOTTOM_ANIMATION_CLASS);
+          [topLayer, bottomLayer] = [bottomLayer, topLayer];
+          topLayer.style.zIndex = "2";
+          bottomLayer.style.zIndex = "1";
+        };
+
+        const onBottomAnimationEnd = () => {
+          topLayer.classList.remove(BOTTOM_ANIMATION_CLASS);
+          bottomLayer.classList.remove(TOP_ANIMATION_CLASS);
+
+          const nextValue = (parseInt(topLayer.children[0].children[0].textContent) + 1) % max;
+          bottomLayer.children[0].children[0].textContent = bottomLayer.children[1].children[0].textContent = nextValue;
+          onUpdate && onUpdate({ value: nextValue });
+
+          if (!once) {
+            topLayer.classList.add(TOP_ANIMATION_CLASS);
+          }
+        };
+
+        container.addEventListener("animationend", (e) => {
+          switch (e.animationName) {
+            case TOP_ANIMATION_NAME: {
+              return onTopAnimationEnd();
+            }
+            case BOTTOM_ANIMATION_NAME: {
+              return onBottomAnimationEnd();
+            }
+          }
+        });
+      }
+
+      const MAX = 3;
+      startAnimation(container2, {
+        max: MAX,
+        onUpdate: ({ value }) => {
+          if (value === 0) {
+            startAnimation(container1, { max: MAX, once: true });
+          }
+        },
+      });
+    </script>
+  </body>
 </html>
